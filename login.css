@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #263043;
+  color: #9e9ea4;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #263043;
+}
+
+.login-card {
+  background-color: #1d2634;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 280px; /* Reduced width */
+}
+
+.login-card h2 {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 15px; /* Reduced margin */
+}
+
+.input-group {
+  margin-bottom: 10px; /* Reduced margin */
+}
+
+.input-group label {
+  display: block;
+  color: #9e9ea4;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: calc(100% - 20px); /* Reduced width */
+  padding: 8px; /* Reduced padding */
+  border: none;
+  border-radius: 5px;
+  background-color: #263043;
+  color: #ffffff;
+  font-size: 14px; /* Reduced font size */
+}
+
+button {
+  width: 100%;
+  padding: 8px; /* Reduced padding */
+  border: none;
+  border-radius: 5px;
+  background-color: #2962ff;
+  color: #ffffff;
+  font-size: 14px; /* Reduced font size */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0039cb;
+}
+
+#error-message {
+  color: #ff0000;
+  text-align: center;
+  margin-top: 10px;
+}

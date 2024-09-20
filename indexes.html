@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Measurement Chart</title>
+    <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Load the date adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <!-- Load FontAwesome for the buzzer icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #121212; /* Dark background color */
+            color: #e0e0e0; /* Light text color */
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background-color: #1e1e1e; /* Dark background for the chart area */
+            border-radius: 8px; /* Rounded corners for the chart */
+        }
+        #buzzer-icon {
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <!-- Buzzer icon -->
+        <i id="buzzer-icon" class="fa fa-bell fa-3x" style="color: gray;"></i>
+    </div>
+    <canvas id="distanceChart" width="400" height="200"></canvas>
+    <p id="latestReading">Latest Distance Reading: -- cm</p>
+
+    <script>
+        // Fetch data and update chart at regular intervals
+        const fetchDataAndUpdateChart = (chart) => {
+            fetch('data.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched Data:", data); // Debugging line
+    
+                    // Process the fetched data
+                    const distances = data.map(item => parseFloat(item.distance));
+                    const timestamps = data.map(item => item.measured_at);
+    
+                    // Update chart data
+                    chart.data.labels = timestamps;
+                    chart.data.datasets[0].data = distances;
+                    chart.update();
+    
+                    // Get the latest reading
+                    const latestDistance = distances[distances.length - 1];
+    
+                    // Display the latest reading
+                    document.getElementById('latestReading').textContent = `Latest Distance Reading: ${latestDistance.toFixed(2)} cm`;
+    
+                    // Update the buzzer icon
+                    const buzzerIcon = document.getElementById('buzzer-icon');
+                    if (latestDistance > 12) {
+                        buzzerIcon.style.color = 'red';  // Turn the buzzer icon red when it is sounding
+                    } else {
+                        buzzerIcon.style.color = 'gray'; // Keep the buzzer icon gray when it is off
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        };
+    
+        // Initialize the Chart.js chart
+        const ctx = document.getElementById('distanceChart').getContext('2d');
+        const distanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Start with empty data
+                datasets: [{
+                    label: 'Distance (cm)',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Distance Reading from Sensor',
+                        font: {
+                            size: 18
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        },
+                        color: '#e0e0e0' // Title text color
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time',
+                            color: '#e0e0e0' // X-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // X-axis labels color
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        min: 0, // Set the minimum value of y-axis
+                        max: 400, // Set the maximum value of y-axis
+                        title: {
+                            display: true,
+                            text: 'Distance (cm)',
+                            color: '#e0e0e0' // Y-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // Y-axis labels color
+                        }
+                    }
+                }
+            }
+        });
+    
+        // Fetch and update data every second
+        setInterval(() => fetchDataAndUpdateChart(distanceChart), 1000);
+    </script>
+</body>
+</html>

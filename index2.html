@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Measurement Charts</title>
+    <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Load the date adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <!-- Load FontAwesome for the buzzer icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #121212; /* Dark background color */
+            color: #e0e0e0; /* Light text color */
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background-color: #1e1e1e; /* Dark background for the chart area */
+            border-radius: 8px; /* Rounded corners for the chart */
+            margin-bottom: 20px; /* Space between charts */
+        }
+        #buzzer-icon {
+            margin-bottom: 10px;
+        }
+        #alert-message {
+            font-size: 18px;
+            color: #ff4f4f; /* Red color for the alert message */
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <!-- Buzzer icon -->
+        <i id="buzzer-icon" class="fa fa-bell fa-3x" style="color: gray;"></i>
+        <span id="alert-message">Warning: Both sensors are above 12 cm!</span>
+    </div>
+    <canvas id="sensor1Chart" width="400" height="200"></canvas>
+    <canvas id="sensor2Chart" width="400" height="200"></canvas>
+
+    <script>
+        // Function to fetch data and update the charts
+        const fetchDataAndUpdateCharts = (sensor1Chart, sensor2Chart) => {
+            fetch('data1.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched Data:", data); // Debugging line
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        console.warn("No valid data returned from server.");
+                        return;
+                    }
+
+                    // Process the fetched data for two sensors
+                    const sensor1Distances = data.map(item => parseFloat(item.sensor1_distance));
+                    const sensor2Distances = data.map(item => parseFloat(item.sensor2_distance));
+                    const timestamps = data.map(item => new Date(item.recorded_at));
+
+                    // Ensure there is data to update
+                    if (sensor1Distances.length === 0 || sensor2Distances.length === 0) {
+                        console.warn("Data arrays are empty.");
+                        return;
+                    }
+
+                    // Update chart data for Sensor 1
+                    sensor1Chart.data.labels = timestamps;
+                    sensor1Chart.data.datasets[0].data = sensor1Distances;
+                    sensor1Chart.update();
+
+                    // Update chart data for Sensor 2
+                    sensor2Chart.data.labels = timestamps;
+                    sensor2Chart.data.datasets[0].data = sensor2Distances;
+                    sensor2Chart.update();
+
+                    // Get the latest readings from both sensors
+                    const latestSensor1Distance = sensor1Distances[sensor1Distances.length - 1];
+                    const latestSensor2Distance = sensor2Distances[sensor2Distances.length - 1];
+
+                    console.log(`Latest Sensor 1 Distance: ${latestSensor1Distance}`);
+                    console.log(`Latest Sensor 2 Distance: ${latestSensor2Distance}`);
+
+                    // Update the buzzer icon and alert message based on sensor distances
+                    const buzzerIcon = document.getElementById('buzzer-icon');
+                    const alertMessage = document.getElementById('alert-message');
+
+                    if (latestSensor1Distance > 12 || latestSensor2Distance > 12) {
+                        buzzerIcon.style.color = 'red';  // Turn the buzzer icon red when either sensor is above 12
+                    } else {
+                        buzzerIcon.style.color = 'gray'; // Keep the buzzer icon gray when both sensors are below or equal to 12
+                    }
+
+                    // Display the alert message if both sensors exceed 12 cm
+                    if (latestSensor1Distance > 12 && latestSensor2Distance > 12) {
+                        alertMessage.style.display = 'inline'; // Show the alert message
+                    } else {
+                        alertMessage.style.display = 'none'; // Hide the alert message
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        };
+
+        // Initialize the Chart.js charts
+        const ctx1 = document.getElementById('sensor1Chart').getContext('2d');
+        const sensor1Chart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: [], // Start with empty data
+                datasets: [
+                    {
+                        label: 'Sensor 1 Distance (cm)',
+                        data: [],
+                        borderColor: 'rgba(255, 255, 255, 1)', // White color
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sensor 1 Distance Reading',
+                        font: {
+                            size: 18
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        },
+                        color: '#e0e0e0' // Title text color
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second' // Use second for real-time updates
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time',
+                            color: '#e0e0e0' // X-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // X-axis labels color
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        min: 0, // Set the minimum value of y-axis
+                        max: 18, // Set the maximum value of y-axis
+                        title: {
+                            display: true,
+                            text: 'Distance (cm)',
+                            color: '#e0e0e0' // Y-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // Y-axis labels color
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('sensor2Chart').getContext('2d');
+        const sensor2Chart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: [], // Start with empty data
+                datasets: [
+                    {
+                        label: 'Sensor 2 Distance (cm)',
+                        data: [],
+                        borderColor: 'rgba(255, 255, 0, 1)', // Yellow color
+                        borderWidth: 2,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sensor 2 Distance Reading',
+                        font: {
+                            size: 18
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        },
+                        color: '#e0e0e0' // Title text color
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second' // Use second for real-time updates
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time',
+                            color: '#e0e0e0' // X-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // X-axis labels color
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        min: 0, // Set the minimum value of y-axis
+                        max: 18, // Set the maximum value of y-axis
+                        title: {
+                            display: true,
+                            text: 'Distance (cm)',
+                            color: '#e0e0e0' // Y-axis title color
+                        },
+                        ticks: {
+                            color: '#e0e0e0' // Y-axis labels color
+                        }
+                    }
+                }
+            }
+        });
+
+        // Fetch and update data every second
+        setInterval(() => {
+            console.log('Fetching data...');
+            fetchDataAndUpdateCharts(sensor1Chart, sensor2Chart);
+        }, 1000);
+    </script>
+</body>
+</html>
