@@ -23,7 +23,8 @@
                 <span class="material-icons-outlined">menu</span>
             </div>
             <div class="header-left">
-                <span class="material-icons-outlined">search</span>
+                <span class="material-icons-outlined search-icon">search</span>
+                <input type="text" id="search-bar" placeholder="Search...">
             </div>
             <div class="header-right">
                 <span class="material-icons-outlined">account_circle</span>
@@ -58,152 +59,169 @@
         <!-- End Sidebar -->
 
         <!-- Main -->
-        <main class="main-container">
+        <main class="main-container" id="main-container">
             <div class="main-title">
                 <h2>DASHBOARD</h2>
             </div>
 
-            <div class="main-cards">
-
-                <div class="card">
+            <div class="main-cards" id="main-cards">
+                <div class="card" onclick="loadContent('temperature.html')">
                     <div class="card-inner">
                         <h3>Temperature and Humid Sensor</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('distance.html')">
                     <div class="card-inner">
                         <h3>Distance Sensor</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('camera.html')">
                     <div class="card-inner">
                         <h3>Raspberry PI Camera and Motion Sensor</h3>
                     </div>
                 </div>
-
-                <!-- New Cards -->
-                <div class="card">
+                <div class="card" onclick="loadContent('gas.html')">
                     <div class="card-inner">
                         <h3>Gas and Vibration Sensor</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('sound.html')">
                     <div class="card-inner">
                         <h3>Sound and Raindrop Sensor</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('gps.html')">
                     <div class="card-inner">
                         <h3>GPS Module</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('voice_control.html')">
                     <div class="card-inner">
                         <h3>Voice Control LED's</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('text_to_speech.html')">
                     <div class="card-inner">
                         <h3>Text to Speech</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('object_detection.html')">
                     <div class="card-inner">
                         <h3>Object Detection using Raspberry Pi Camera</h3>
                     </div>
                 </div>
-
-                <div class="card">
+                <div class="card" onclick="loadContent('face_recognition.html')">
                     <div class="card-inner">
                         <h3>Face Recognition using Raspberry Pi Camera</h3>
                     </div>
                 </div>
-
             </div>
-
         </main>
         <!-- End Main -->
-
     </div>
 
     <!-- Custom JS -->
     <script src="js/scripts.js"></script>
 
-    <!-- Inline JavaScript for Clearing and Showing Dashboard -->
+    <!-- Inline JavaScript for Features -->
     <script>
         function clearDashboard() {
-            const mainContainer = document.querySelector('.main-container');
-            mainContainer.innerHTML = ''; // Clear all content inside main-container
+            document.getElementById('main-container').innerHTML = ''; // Clear the main container
         }
 
         function showDashboard() {
-            const mainContainer = document.querySelector('.main-container');
+            const mainContainer = document.getElementById('main-container');
             mainContainer.innerHTML = `
                 <div class="main-title">
                     <h2>DASHBOARD</h2>
                 </div>
-                <div class="main-cards">
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Temperature and Humid Sensor</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Distance Sensor</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Raspberry PI Camera and Motion Sensor</h3>
-                        </div>
-                    </div>
-                    <!-- New Cards -->
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Gas and Vibration Sensor</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Sound and Raindrop Sensor</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>GPS Module</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Voice Control LED's</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Text to Speech</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Object Detection using Raspberry Pi Camera</h3>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-inner">
-                            <h3>Face Recognition using Raspberry Pi Camera</h3>
-                        </div>
+                <div class="main-cards" id="main-cards">
+                    ${getOriginalCardsHTML()}
+                </div>
+            `;
+            attachCardClickHandlers(); // Reattach click handlers to cards
+        }
+
+        function getOriginalCardsHTML() {
+            return `
+                <div class="card" onclick="loadContent('temperature.html')">
+                    <div class="card-inner">
+                        <h3>Temperature and Humid Sensor</h3>
                     </div>
                 </div>
-            `; // Re-add the content to main-container
+                <div class="card" onclick="loadContent('distance.html')">
+                    <div class="card-inner">
+                        <h3>Distance Sensor</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('camera.html')">
+                    <div class="card-inner">
+                        <h3>Raspberry PI Camera and Motion Sensor</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('gas.html')">
+                    <div class="card-inner">
+                        <h3>Gas and Vibration Sensor</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('sound.html')">
+                    <div class="card-inner">
+                        <h3>Sound and Raindrop Sensor</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('gps.html')">
+                    <div class="card-inner">
+                        <h3>GPS Module</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('voice_control.html')">
+                    <div class="card-inner">
+                        <h3>Voice Control LED's</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('text_to_speech.html')">
+                    <div class="card-inner">
+                        <h3>Text to Speech</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('object_detection.html')">
+                    <div class="card-inner">
+                        <h3>Object Detection using Raspberry Pi Camera</h3>
+                    </div>
+                </div>
+                <div class="card" onclick="loadContent('face_recognition.html')">
+                    <div class="card-inner">
+                        <h3>Face Recognition using Raspberry Pi Camera</h3>
+                    </div>
+                </div>
+            `;
         }
+
+        function loadContent(htmlFile) {
+            fetch(htmlFile)
+                .then(response => response.text())
+                .then(content => {
+                    document.getElementById('main-container').innerHTML = content;
+                })
+                .catch(err => console.error('Error loading content:', err));
+        }
+
+        function attachCardClickHandlers() {
+            document.querySelectorAll('.card').forEach(card => {
+                card.onclick = function() {
+                    loadContent(card.getAttribute('data-file'));
+                };
+            });
+        }
+
+        document.getElementById('search-bar').addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const cardText = card.innerText.toLowerCase();
+                card.style.display = cardText.includes(filter) ? 'block' : 'none';
+            });
+        });
     </script>
-  </body>
+</body>
 </html>
